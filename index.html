@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>«Арман» дүкені</title>
+<meta name="description" content="«Арман» дүкені — арман сататын сиқырлы дүкен. Жұма СӨЖ: «Егер мен дүкен ашсам…»">
+<meta name="theme-color" content="#f6eddc">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23fbf4e6'/%3E%3Cpath d='M40 12a20 20 0 1 0 12 34A17 17 0 1 1 40 12z' fill='%23e8413c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400;1,7..72,500&family=Caveat:wght@500;700&family=Rubik:wght@900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=2">
+</head>
+<body>
+
+<!-- SVG filters: #wc = watercolor paint for letters, #rough = torn paper edge, #ink = rubber-stamp ink -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="wc" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="9" result="g"/>
+    <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.1 1.15" result="ga"/>
+    <feComposite in="d" in2="ga" operator="in" result="tex"/>
+    <feGaussianBlur in="tex" stdDeviation="1.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="tex"/></feMerge>
+  </filter>
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="4" seed="2" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="ink" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="5" result="g"/>
+    <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -.9 1.4" result="ga"/>
+    <feComposite in="SourceGraphic" in2="ga" operator="in" result="t"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="8" result="n"/>
+    <feDisplacementMap in="t" in2="n" scale="3"/>
+  </filter>
+</svg>
+
+<!-- ───────────── Gate: the first screen (a click is needed for sound) ───────────── -->
+<div class="gate" id="gate">
+  <div class="gate__sheet">
+    <div class="gate__moon" aria-hidden="true"></div>
+    <p class="gate__kick">Жұма СӨЖ · «Егер мен дүкен ашсам…»</p>
+    <h1 class="gate__title">Көзіңді жұм да,<br><em>арманыңды елестет.</em></h1>
+    <button class="gate__play" id="gatePlay" type="button" aria-label="Бастау">
+      <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+    </button>
+    <p class="gate__hint">бастау · дыбысты қосыңыз</p>
+  </div>
+  <button class="gate__skip" id="gateSkip" type="button">бірден презентацияға →</button>
+</div>
+
+<!-- ───────────── The edit: ~18 seconds about dreams ───────────── -->
+<div class="edit" id="edit" aria-hidden="true">
+  <canvas class="edit__paint" id="edPaint"></canvas>
+  <canvas class="edit__gl" id="edGL"></canvas>
+  <div class="ed-word" id="edWord"></div>
+  <div class="ed-arman" id="edArman">
+    <span style="--c:#e8413c;--r:-6deg">А</span><span style="--c:#f39a2b;--r:4deg">Р</span><span style="--c:#3fbf5a;--r:-3deg">М</span><span style="--c:#3b8be0;--r:5deg">А</span><span style="--c:#7b4fc9;--r:-4deg">Н</span>
+  </div>
+  <div class="ed-hud" id="edHud">
+    <div class="ed-hud__lbl">REM · Түс көру фазасы</div>
+    <div class="ed-hud__box ed-hud__box--a"><canvas id="edEeg" width="420" height="180"></canvas><small>ЭЭГ · θ-толқын</small></div>
+    <div class="ed-hud__box ed-hud__box--b"><b id="edHz">6.4</b><small>Гц · ми белсенділігі</small></div>
+  </div>
+  <div class="ed-cap" id="edCap"></div>
+  <div class="ed-final" id="edFinal"><span>Ал егер арманды</span><em>сатып алуға болса?</em></div>
+  <div class="ed-flash" id="edFlash"></div>
+  <div class="ed-grain"></div>
+  <button class="ed-skip" id="edSkip" type="button">өткізу →</button>
+</div>
+
+<!-- the old-TV shutdown / switch-on line -->
+<div class="crt" id="crt" aria-hidden="true"><i class="crt__line"></i></div>
+
+<!-- ───────────── The presentation ───────────── -->
+<div class="site" id="site">
+  <canvas class="world" id="world"></canvas>
+
+  <!-- fixed 1920×1080 stage, scaled as a whole to the window -->
+  <div class="stage" id="stage">
+  <main class="deck" id="deck">
+
+    <!-- 1 · title -->
+    <section class="slide s1" data-title="Атауы">
+      <div class="mist mist--l"></div>
+      <span class="stamp s1__stamp" data-r style="--rot:-7deg;--d:.1s">Жұма СӨЖ · ЖҚТ А1</span>
+      <h1 class="paint s1__paint" aria-label="Арман"><span style="--c:#e8413c;--i:0;--r:-5deg">А</span><span style="--c:#f39a2b;--i:1;--r:3deg">Р</span><span style="--c:#3fbf5a;--i:2;--r:-2deg">М</span><span style="--c:#3b8be0;--i:3;--r:4deg">А</span><span style="--c:#7b4fc9;--i:4;--r:-3deg">Н</span></h1>
+      <p class="s1__sub" data-split>дүкені</p>
+      <svg class="brush s1__brush" viewBox="0 0 420 40" aria-hidden="true"><path d="M6 26 C 90 8, 200 34, 300 16 S 400 20, 414 12" /></svg>
+      <p class="s1__lead" data-r style="--d:.9s">Мұнда арман сатылады. Сатып аласыз&nbsp;— ол сиқырлы түрде орындалады.</p>
+      <div class="ticket s1__ticket" data-r style="--rot:2.5deg;--d:1.1s">
+        <small>Дайындаған</small><b>Арнур</b>
+      </div>
+    </section>
+
+    <!-- 2 · where -->
+    <section class="slide s2" data-title="Мекенжайы">
+      <div class="card-paper s2__card" data-r style="--rot:1.6deg;--d:.15s">
+        <i class="tape tape--l"></i><i class="tape tape--r"></i>
+        <span class="postmark" aria-hidden="true"><b>АЛМАТЫ</b><small>22:00</small></span>
+        <h2 class="h-ink" data-split>Дүкен қайда?</h2>
+        <p class="body">Менің дүкенім <u>Алматы</u> қаласында орналасқан&nbsp;— аспанда, бұлттардың үстінде, ұшатын аралда. Онда сарқырамалар, гүлдер және феникстер бар.</p>
+        <dl class="lines">
+          <div><dt>Қала</dt><dd>Алматы</dd></div>
+          <div><dt>Мекенжай</dt><dd>Бұлт көшесі, 7</dd></div>
+          <div><dt>Уақыты</dt><dd>22:00 – 07:00, түнде</dd></div>
+        </dl>
+        <div class="pick" role="radiogroup" aria-label="Дүкен қандай?">
+          <span class="pick__q">Дүкен қандай?</span>
+          <button type="button" class="pick__opt is-on" role="radio" aria-checked="true" data-size="big"><svg viewBox="0 0 60 60" aria-hidden="true"><rect x="8" y="8" width="44" height="44" rx="6"/><path class="tick" d="M14 30 L26 44 L52 10"/></svg>Үлкен</button>
+          <button type="button" class="pick__opt" role="radio" aria-checked="false" data-size="small"><svg viewBox="0 0 60 60" aria-hidden="true"><rect x="8" y="8" width="44" height="44" rx="6"/><path class="tick" d="M14 30 L26 44 L52 10"/></svg>Кішкентай</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · products -->
+    <section class="slide s3" data-title="Тауарлар">
+      <div class="mist mist--t"></div>
+      <h2 class="paint paint--md s3__paint" aria-label="Тауарлар"><span style="--c:#7b4fc9;--i:0;--r:-3deg">Т</span><span style="--c:#3b8be0;--i:1;--r:2deg">А</span><span style="--c:#3fbf5a;--i:2;--r:-2deg">У</span><span style="--c:#f39a2b;--i:3;--r:3deg">А</span><span style="--c:#e8413c;--i:4;--r:-1deg">Р</span><span style="--c:#7b4fc9;--i:5;--r:2deg">Л</span><span style="--c:#3b8be0;--i:6;--r:-3deg">А</span><span style="--c:#3fbf5a;--i:7;--r:2deg">Р</span></h2>
+      <div class="polas">
+        <figure class="pola" data-r style="--rot:-3deg;--d:.45s"><i class="tape"></i><div class="pola__img pola__img--fire" data-view="bird"></div><figcaption><b>Феникспен ұшу</b><span>бір сағат аспанда</span></figcaption><em class="pola__n">01</em></figure>
+        <figure class="pola" data-r style="--rot:2deg;--d:.55s"><i class="tape"></i><div class="pola__img pola__img--sky" data-view="island"></div><figcaption><b>Өз аралың</b><span>жеке ұшатын арал</span></figcaption><em class="pola__n">02</em></figure>
+        <figure class="pola" data-r style="--rot:-1.5deg;--d:.65s"><i class="tape"></i><div class="pola__img pola__img--dawn" data-view="fall"></div><figcaption><b>Сарқырамаға саяхат</b><span>бұлт үстіндегі сарқырама</span></figcaption><em class="pola__n">03</em></figure>
+        <figure class="pola" data-r style="--rot:3deg;--d:.75s"><i class="tape"></i><div class="pola__img pola__img--space" data-view="space"></div><figcaption><b>Ғарышқа саяхат</b><span>сақиналы планетаға</span></figcaption><em class="pola__n">04</em></figure>
+      </div>
+    </section>
+
+    <!-- 4 · prices -->
+    <section class="slide s4" data-title="Бағалар">
+      <div class="mist mist--t"></div>
+      <h2 class="paint paint--md s4__paint" aria-label="Бағалар"><span style="--c:#e8413c;--i:0;--r:-3deg">Б</span><span style="--c:#f39a2b;--i:1;--r:2deg">А</span><span style="--c:#3fbf5a;--i:2;--r:-2deg">Ғ</span><span style="--c:#3b8be0;--i:3;--r:3deg">А</span><span style="--c:#7b4fc9;--i:4;--r:-1deg">Л</span><span style="--c:#e8413c;--i:5;--r:2deg">А</span><span style="--c:#f39a2b;--i:6;--r:-3deg">Р</span></h2>
+      <svg class="rope" viewBox="0 0 1920 120" aria-hidden="true"><path d="M-20 30 Q 960 150 1940 30"/></svg>
+      <div class="tags">
+        <div class="tag" data-r style="--rot:-4deg;--d:.4s;--y:62px"><i class="tag__str" style="--h:62px"></i><div class="tag__img tag__img--fire" data-view="bird"></div><span class="tag__name">Феникспен ұшу</span><b class="tag__price"><span data-count="50000">0</span></b><small>теңге · 1 сағат</small></div>
+        <div class="tag" data-r style="--rot:3deg;--d:.5s;--y:92px"><i class="tag__str" style="--h:92px"></i><div class="tag__img" data-view="island"></div><span class="tag__name">Өз аралың</span><b class="tag__price"><span data-count="990000">0</span></b><small>теңге · мәңгілік</small></div>
+        <div class="tag" data-r style="--rot:-2deg;--d:.6s;--y:96px"><i class="tag__str" style="--h:96px"></i><div class="tag__img" data-view="fall"></div><span class="tag__name">Сарқырамаға саяхат</span><b class="tag__price"><span data-count="30000">0</span></b><small>теңге · 1 күн</small><span class="stamp stamp--round tag__hit">хит!</span></div>
+        <div class="tag" data-r style="--rot:-3deg;--d:.7s;--y:62px"><i class="tag__str" style="--h:62px"></i><div class="tag__img tag__img--night" data-view="space"></div><span class="tag__name">Ғарышқа саяхат</span><b class="tag__price"><span data-count="150000">0</span></b><small>теңге · 3 күн</small></div>
+      </div>
+      <p class="hand s4__note" data-r style="--rot:-2deg;--d:1.1s">ақшаңыз аз болса — сарқырамадан бастаңыз!</p>
+    </section>
+
+    <!-- 5 · conditions -->
+    <section class="slide s5" data-title="Шарттар">
+      <div class="note s5__note" data-r style="--rot:-1.2deg;--d:.15s">
+        <i class="tape tape--c"></i>
+        <h2 class="h-ink" data-split>Шарттар</h2>
+        <p class="hand s5__sub">егер сіз… — онда мен…</p>
+        <ol class="rules">
+          <li data-r style="--d:.45s"><p>Көп <mark>алсаңыз</mark>, арзан болады. <small>3 арман — 20% жеңілдік</small></p><span class="stamp stamp--round" style="--ink:#e8413c;--rot:-12deg">−20%</span></li>
+          <li data-r style="--d:.55s"><p>Қолма-қол <mark>төлесеңіз</mark>, жеңілдік беремін.</p><span class="stamp stamp--round" style="--ink:#f39a2b;--rot:8deg">−10%</span></li>
+          <li data-r style="--d:.65s"><p>Досыңызбен <mark>келсеңіз</mark>, екінші саяхат тегін.</p><span class="stamp stamp--round" style="--ink:#2fa84f;--rot:-6deg">тегін</span></li>
+          <li data-r style="--d:.75s"><p>Туған күніңізде <mark>келсеңіз</mark>, феникс сізді үйге апарады.</p><span class="stamp stamp--round" style="--ink:#7b4fc9;--rot:10deg">сыйлық</span></li>
+          <li data-r style="--d:.85s"><p>Арманыңыз <mark>орындалмаса</mark>, ақшаңызды қайтарамын.</p><span class="stamp stamp--round" style="--ink:#3b8be0;--rot:-9deg">100%</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 6 · finale -->
+    <section class="slide s6" data-title="Рахмет">
+      <div class="mist mist--c"></div>
+      <h2 class="paint paint--xl s6__paint" aria-label="Келіңіздер!"><span style="--c:#e8413c;--i:0;--r:-4deg">К</span><span style="--c:#f39a2b;--i:1;--r:3deg">е</span><span style="--c:#3fbf5a;--i:2;--r:-2deg">л</span><span style="--c:#3b8be0;--i:3;--r:4deg">і</span><span style="--c:#7b4fc9;--i:4;--r:-3deg">ң</span><span style="--c:#e8413c;--i:5;--r:2deg">і</span><span style="--c:#f39a2b;--i:6;--r:-4deg">з</span><span style="--c:#3fbf5a;--i:7;--r:3deg">д</span><span style="--c:#3b8be0;--i:8;--r:-2deg">е</span><span style="--c:#7b4fc9;--i:9;--r:4deg">р</span><span style="--c:#e8413c;--i:10;--r:-3deg">!</span></h2>
+      <p class="hand s6__thanks" data-r style="--rot:-3deg;--d:1.2s">Рахмет!</p>
+      <p class="s6__line" data-r style="--d:1.5s">«Арман» дүкені · Алматы, бұлттардың үстінде</p>
+    </section>
+  </main>
+  </div>
+  <!-- the live 3D "photos" of the products are drawn on this layer, inside each [data-view] box -->
+  <canvas class="views" id="views"></canvas>
+
+  <header class="chrome">
+    <a class="brand" href="#1" aria-label="«Арман» дүкені"><span style="color:#e8413c">А</span><span style="color:#f39a2b">Р</span><span style="color:#3fbf5a">М</span><span style="color:#3b8be0">А</span><span style="color:#7b4fc9">Н</span></a>
+    <div class="chrome__right">
+      <button class="chip" id="btnNotes" type="button" title="Сөйлеу мәтіні (N)">мәтін</button>
+      <button class="chip" id="btnSnd" type="button" title="Дыбыс (M)">дыбыс</button>
+      <span class="count"><b id="cur">01</b> / <span id="tot">06</span></span>
+    </div>
+  </header>
+  <nav class="dots" id="dots" aria-label="Слайдтар"></nav>
+  <button class="arrow arrow--l" id="prev" type="button" aria-label="Алдыңғы"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="arrow arrow--r" id="next" type="button" aria-label="Келесі"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="notes" id="notes" aria-live="polite"></div>
+  <div class="loading" id="loading"><span class="paint paint--sm"><span style="--c:#e8413c">А</span><span style="--c:#f39a2b">Р</span><span style="--c:#3fbf5a">М</span><span style="--c:#3b8be0">А</span><span style="--c:#7b4fc9">Н</span></span><small>арман жүктелуде…</small></div>
+</div>
+
+<script src="js/vendor/three.min.js"></script>
+<script src="js/vendor/GLTFLoader.js"></script>
+<script src="js/speech.js?v=2"></script>
+<script src="js/sfx.js?v=2"></script>
+<script src="js/models.js?v=2"></script>
+<script src="js/world.js?v=2"></script>
+<script src="js/views.js?v=2"></script>
+<script src="js/deck.js?v=2"></script>
+<script src="js/edit.js?v=2"></script>
+</body>
+</html>
